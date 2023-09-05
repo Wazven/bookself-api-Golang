@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"bookself-api/book"
 
@@ -25,25 +26,43 @@ func (handler *bookHandler)RootHandler(c *gin.Context) {
 	})
 }
 
-func (handler *bookHandler) HelloHandler(c *gin.Context) {
+func (handler *bookHandler) GetAllBooks(c *gin.Context){
+	books, err := handler.bookService.FindAll()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin. H{
+			"errors": err,
+		})
+		return
+	}
+	var booksResponse []book.BookResponse
+
+	for _, b := range books{
+		bookResponse := convertToBookResponse(b)
+		booksResponse = append(booksResponse, bookResponse)
+	}
 	c.JSON(http.StatusOK, gin.H{
-		"About":   "This is for testing API",
-		"Purpose": "Study API GOLANG",
+		"data": booksResponse,
 	})
 }
 
-func (handler *bookHandler) BooksHandler(c *gin.Context) {
-	id := c.Param("id")
-	title := c.Param("title")
+func (handler *bookHandler) GetBook(c *gin.Context){
+	idString := c.Param("id")
+	id, err := strconv.Atoi(idString)
 
-	c.JSON(http.StatusOK, gin.H{"id": id, "title": title})
-}
+	b, err := handler.bookService.FindByID(int(id))
 
-func (handler *bookHandler) QueryHandler(c *gin.Context) {
-	title := c.Query("title")
-	price := c.Query("price")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin. H{
+			"errors": err,
+		})
+		return
+	}
 
-	c.JSON(http.StatusOK, gin.H{"title": title, "price": price})
+	bookResponse := convertToBookResponse(b)
+	
+	c.JSON(http.StatusOK, gin.H{
+		"data": bookResponse,
+	})
 }
 
 func (handler *bookHandler) PostBooksHandler(c *gin.Context){
@@ -75,4 +94,14 @@ func (handler *bookHandler) PostBooksHandler(c *gin.Context){
 	c.JSON(http.StatusOK, gin.H{
 		"data": book,
 	})
+}
+
+func convertToBookResponse(b book.Book) book.BookResponse{
+	return book.BookResponse{
+			Title: b.Title,
+			Price: b.Price,
+			Description: b.Description,
+			Rating: b.Rating,
+			ID: b.ID,
+	}
 }

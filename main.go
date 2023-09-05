@@ -126,10 +126,9 @@ func main() {
 
 
 	v1.GET("/", bookHandler.RootHandler)
-	v1.GET("/hello", bookHandler.HelloHandler)
-	router.GET("/books/:id/:title", bookHandler.BooksHandler)
-	router.GET("/query", bookHandler.QueryHandler)
+	router.GET("/GetAllBooks", bookHandler.GetAllBooks)
 	router.POST("/addBooks", bookHandler.PostBooksHandler)
+	router.GET("/GetBook/:id", bookHandler.GetBook)
 
 	router.Run(":2000")
 }
