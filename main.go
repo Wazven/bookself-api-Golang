@@ -129,6 +129,8 @@ func main() {
 	router.GET("/GetAllBooks", bookHandler.GetAllBooks)
 	router.POST("/addBooks", bookHandler.PostBooksHandler)
 	router.GET("/GetBook/:id", bookHandler.GetBook)
+	router.PUT("/UpdateBook/:id", bookHandler.UpdateBook)
+	v1.DELETE("/DeleteBook/:id", bookHandler.DeleteBook)
 
 	router.Run(":2000")
 }
